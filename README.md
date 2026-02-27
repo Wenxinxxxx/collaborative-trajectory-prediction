@@ -75,6 +75,10 @@ conda activate traj_pred
 
 ### 2. 数据准备
 
+**数据集来源：** 本项目使用的 V2X-Seq-TFD 数据集由清华大学AIR实验室提供，原始数据下载地址：
+
+> [V2X-Seq-TFD Dataset (Google Drive)](https://drive.google.com/drive/folders/1yDnlrPCKImpVfI1OPBYyzLFWkhZP5v-7)
+
 ```bash
 # 将 V2X-Seq-TFD-Example.zip 放到 data/ 目录下
 cd data
@@ -122,6 +126,16 @@ python visualize.py
 | **MR** | Miss Rate | 终点误差超过阈值的比例 |
 
 所有指标越低越好。
+
+---
+
+## 数据集声明
+
+本项目使用的 **V2X-Seq-TFD** 数据集来自清华大学AIR实验室（THU AIR Lab），该数据集为车路协同感知与预测领域的大规模序列数据集。
+
+- **数据集下载：** [Google Drive](https://drive.google.com/drive/folders/1yDnlrPCKImpVfI1OPBYyzLFWkhZP5v-7)
+- **原始论文：** Yu et al., "V2X-Seq: A Large-Scale Sequential Dataset for Vehicle-Infrastructure Cooperative Perception and Forecasting," CVPR 2023.
+- **数据集许可：** 该数据集仅用于学术研究目的，使用时请遵循原作者的许可协议并引用原始论文。
 
 ---
 

@@ -17,7 +17,7 @@ import json
 import torch
 import torch.nn as nn
 from torch.optim import Adam
-from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.optim.lr_scheduler import ReduceLROnPlateau, CosineAnnealingWarmRestarts
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from config import *
@@ -170,12 +170,20 @@ def train_model(model_name, num_epochs=None, batch_size=None):
         print("Using WinnerTakeAllLoss with smoothness regularization")
     else:
         criterion = WinnerTakeAllLoss(lambda_cls=1.0)
-    optimizer = Adam(model.parameters(), lr=LEARNING_RATE,
-                     weight_decay=WEIGHT_DECAY)
-    scheduler = ReduceLROnPlateau(optimizer, mode='min',
-                                  factor=SCHEDULER_FACTOR,
-                                  patience=SCHEDULER_PATIENCE)
-    early_stopping = EarlyStopping(patience=EARLY_STOPPING_PATIENCE)
+    if model_name == 'v2x_graph_plus':
+        optimizer = Adam(model.parameters(), lr=5e-4,
+                         weight_decay=1e-4)
+        scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=20, T_mult=2, eta_min=1e-6)
+        early_stopping = EarlyStopping(patience=20)
+        print(f"Using CosineAnnealingWarmRestarts (T_0=20, T_mult=2, eta_min=1e-6)")
+        print(f"Initial LR: 5e-4, EarlyStopping patience: 20")
+    else:
+        optimizer = Adam(model.parameters(), lr=LEARNING_RATE,
+                         weight_decay=WEIGHT_DECAY)
+        scheduler = ReduceLROnPlateau(optimizer, mode='min',
+                                      factor=SCHEDULER_FACTOR,
+                                      patience=SCHEDULER_PATIENCE)
+        early_stopping = EarlyStopping(patience=EARLY_STOPPING_PATIENCE)
 
     # Training loop
     best_val_loss = float('inf')
@@ -195,7 +203,10 @@ def train_model(model_name, num_epochs=None, batch_size=None):
         val_stats = evaluate(model, val_loader, criterion, device)
 
         # Scheduler step
-        scheduler.step(val_stats['loss'])
+        if model_name == 'v2x_graph_plus':
+            scheduler.step(epoch)
+        else:
+            scheduler.step(val_stats['loss'])
 
         # Record history
         history['train'].append(train_stats)

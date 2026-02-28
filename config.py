@@ -111,6 +111,23 @@ V2X_GRAPH_CONFIG = {
     'num_modes': NUM_MODES,
 }
 
+# --- V2X-Graph+ (Optimized V2X-Graph) ---
+V2X_GRAPH_PLUS_CONFIG = {
+    'input_dim': INPUT_DIM,
+    'hidden_dim': 128,
+    'num_gnn_layers': 3,
+    'num_heads': 4,
+    'dropout': 0.1,
+    'output_dim': INPUT_DIM,
+    'history_steps': HISTORY_STEPS,
+    'future_steps': FUTURE_STEPS,
+    'max_agents': MAX_AGENTS,
+    'map_dim': MAP_DIM,
+    'max_lanes': MAX_LANES,
+    'lane_points': LANE_POINTS,
+    'num_modes': NUM_MODES,
+}
+
 # --- Social LSTM ---
 SOCIAL_LSTM_CONFIG = {
     'input_dim': INPUT_DIM,

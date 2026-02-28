@@ -3,6 +3,7 @@ from .social_lstm import SocialLSTM
 from .grip_plus import GRIPPlusPlus
 from .transformer_pred import TransformerPredictor
 from .v2x_graph import V2XGraphPredictor
+from .v2x_graph_plus import V2XGraphPlusPredictor
 from .co_mtp import CoMTP
 from .enhanced_co_mtp import EnhancedCoMTP
 
@@ -12,6 +13,7 @@ MODEL_REGISTRY = {
     'grip_plus': GRIPPlusPlus,
     'transformer': TransformerPredictor,
     'v2x_graph': V2XGraphPredictor,
+    'v2x_graph_plus': V2XGraphPlusPredictor,
     'co_mtp': CoMTP,
     'enhanced_co_mtp': EnhancedCoMTP,
 }

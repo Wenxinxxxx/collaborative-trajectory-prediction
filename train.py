@@ -24,7 +24,7 @@ from config import *
 from datasets.trajectory_dataset import get_dataloaders
 from models import get_model
 from utils.metrics import compute_batch_metrics
-from utils.losses import WinnerTakeAllLoss
+from utils.losses import WinnerTakeAllLoss, WinnerTakeAllLossWithSmoothing
 from utils.helpers import (set_seed, count_parameters, save_checkpoint,
                            EarlyStopping, AverageMeter)
 
@@ -37,6 +37,7 @@ def get_model_config(model_name):
         'grip_plus': GRIP_PLUS_CONFIG,
         'transformer': TRANSFORMER_CONFIG,
         'v2x_graph': V2X_GRAPH_CONFIG,
+        'v2x_graph_plus': V2X_GRAPH_PLUS_CONFIG,
         'co_mtp': CO_MTP_CONFIG,
         'enhanced_co_mtp': ENHANCED_CO_MTP_CONFIG,
     }
@@ -164,7 +165,11 @@ def train_model(model_name, num_epochs=None, batch_size=None):
     print(f"Cooperative: {model.cooperative}")
 
     # Loss, optimizer, scheduler
-    criterion = WinnerTakeAllLoss(lambda_cls=1.0)
+    if model_name == 'v2x_graph_plus':
+        criterion = WinnerTakeAllLossWithSmoothing(lambda_cls=1.0, lambda_smooth=0.1)
+        print("Using WinnerTakeAllLoss with smoothness regularization")
+    else:
+        criterion = WinnerTakeAllLoss(lambda_cls=1.0)
     optimizer = Adam(model.parameters(), lr=LEARNING_RATE,
                      weight_decay=WEIGHT_DECAY)
     scheduler = ReduceLROnPlateau(optimizer, mode='min',
@@ -257,8 +262,9 @@ def train_model(model_name, num_epochs=None, batch_size=None):
 def main():
     parser = argparse.ArgumentParser(description='Train trajectory prediction models')
     parser.add_argument('--model', type=str, default='all',
-                        choices=['lstm_seq2seq', 'transformer', 'v2x_graph',
-                                 'co_mtp', 'all'],
+                        choices=['lstm_seq2seq', 'social_lstm', 'grip_plus',
+                                 'transformer', 'v2x_graph', 'v2x_graph_plus',
+                                 'co_mtp', 'enhanced_co_mtp', 'all'],
                         help='Which model to train')
     parser.add_argument('--epochs', type=int, default=None,
                         help='Override number of epochs')
@@ -269,7 +275,9 @@ def main():
     create_dirs()
 
     if args.model == 'all':
-        models_to_train = ['lstm_seq2seq', 'transformer', 'v2x_graph', 'co_mtp']
+        models_to_train = ['lstm_seq2seq', 'social_lstm', 'grip_plus',
+                           'transformer', 'v2x_graph', 'v2x_graph_plus',
+                           'co_mtp', 'enhanced_co_mtp']
     else:
         models_to_train = [args.model]
 
